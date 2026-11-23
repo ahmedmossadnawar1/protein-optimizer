@@ -1,203 +1,74 @@
-# 🌱 PlantProtein AI — Intelligent Protein Blend Optimizer
+# PlantProtein AI: Protein Blend Optimizer
 
-An AI-powered system that generates scientifically valid plant-based protein blends optimized to match the amino acid profile of egg protein using advanced optimization and machine learning.
+A Flask web app that generates plant-based protein blends and scores them against the amino acid profile of egg protein. It combines constrained numerical optimization (scipy SLSQP) with a machine learning model trained on food composition data.
 
----
+## What It Does
 
-## 🚀 Overview
+- Loads a dataset of 603 foods with amino acid profiles (`merged.xlsx`)
+- Trains a regression model at startup to predict blend scores
+- Builds blends under constraints (for example: no ingredient above 60% of a blend, ingredients under 10g protein/100g capped at 5%)
+- Scores blends with a weighted combination of cosine similarity to the egg amino acid profile, a PDCAAS-style calculation, and the ML model's prediction
+- Generates recipe suggestions from a blend
 
-PlantProtein AI is a hybrid system that combines:
+## Tech Stack
 
-* Mathematical optimization (SLSQP)
-* Machine learning predictions
-* Nutritional science (FAO/WHO standards)
+- Python, Flask
+- scipy, scikit-learn, pandas, numpy
+- Single-page frontend (`index.html`)
 
-To generate **realistic, high-quality plant protein blends** that approximate the amino acid profile of egg protein.
-
----
-
-## 🎯 Key Features
-
-### 🧠 Smart Optimization Engine
-
-* Uses **Scipy SLSQP** for constrained optimization
-* Enforces strict nutritional constraints:
-
-  * Max ingredient weight ≤ 60%
-  * Low-protein ingredients ≤ 5%
-  * Target protein ≥ 20g/100g
-
----
-
-### 🤖 AI-Powered Scoring
-
-* Hybrid scoring system:
+## Project Structure
 
 ```
-Score = 0.4 × Cosine Similarity + 0.4 × PDCAAS + 0.2 × ML Prediction
-```
-
-* ML model trained on:
-
-  * 603 real foods
-  * 5000 synthetic blends
-  * R² ≈ 0.97
-
----
-
-### 🧬 Amino Acid Matching
-
-* Compares blend vs **Egg Protein Reference**
-* Uses:
-
-  * Cosine similarity (shape)
-  * PDCAAS / DIAAS (quality)
-
----
-
-### ⚠️ Intelligent Fallback System
-
-When no exact solution exists:
-
-* System generates the **closest valid blend**
-* Removes low-protein ingredients automatically
-* Maintains scientific validity
-
----
-
-### 🍽 AI Recipe Generation
-
-* Converts blends into real-world recipes
-* Fully safe (no crashes, fallback supported)
-
----
-
-## 📊 Scientific Foundations
-
-* FAO / WHO protein standards
-* Essential Amino Acid (EAA) modeling
-* PDCAAS & DIAAS calculations
-* g/100g normalization for fair comparison
-
----
-
-## 🧱 Project Structure
-
-```
-├── app.py              # Main backend (Flask + optimizer)
+├── app.py              # Flask backend: optimization, ML training, API
 ├── index.html          # Frontend UI
 ├── ml_model.py         # ML training pipeline
 ├── merged.xlsx         # Food dataset (603 foods)
 ├── requirements.txt    # Dependencies
-├── README.md           # Project documentation
+└── README.md           # This file
 ```
 
----
-
-## ⚙️ Installation
+## Installation
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
-
-## ▶️ Run the Project
+## Run
 
 ```bash
 python app.py
 ```
 
-ثم افتح:
+The model trains at startup (about a minute), then the app is available at http://localhost:5000
 
-```
-http://localhost:5000
-```
+## API Overview
 
----
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Web UI |
+| `/api/status` | GET | Server and model status |
+| `/api/metrics` | GET | Model metrics and feature importance |
+| `/api/blends` | GET | Generate optimized blends |
+| `/api/predict_custom` | POST | Optimize a blend from selected ingredients |
+| `/api/predict_food` | POST | Score a single food |
+| `/api/generate_recipe` | POST | Generate a recipe from a blend |
+| `/api/all_foods` | GET | List foods in the dataset |
+| `/api/top_foods` | GET | Top foods by protein content |
+| `/api/train` | POST | Retrain the model |
+| `/api/add_data` | POST | Add extra food data files |
+| `/api/extra_files` | GET | List added data files |
+| `/api/remove_extra` | POST | Remove an added data file |
 
-## 🧪 Example Output
+## Model Performance
 
-* Protein: 21.2g / 100g
-* Similarity to Egg: 94.8%
-* Blend:
+On the most recent local training run the regression model reached R² = 0.975 (cross-validated R² = 0.963) against its own synthetic blend scoring data. This measures how well the model reproduces its own scoring function; it is not a measure of nutritional accuracy.
 
-  * Chickpeas (60%)
-  * Pumpkin Seeds (40%)
+## Limitations
 
----
+- Blend scores are computational estimates based on the dataset and scoring function in this repo. They are not validated dietary, medical, or clinical guidance.
+- The amino acid reference data comes from the bundled dataset and has not been independently verified.
+- This is a graduation project, not a production nutrition tool.
 
-## ⚠️ Handling Edge Cases
+## Author
 
-### Optimization Failure
-
-If constraints conflict:
-
-* System does NOT crash ❌
-* System returns:
-  ✔ Closest valid blend
-  ✔ Scientifically acceptable output
-
----
-
-### Data Safety
-
-* No undefined values
-* No invalid arrays
-* Full frontend/backend validation
-
----
-
-## 🧠 Design Philosophy
-
-> The system prioritizes **scientific correctness over forced results**
-
-* No fake values
-* No artificial inflation
-* No breaking constraints
-
----
-
-## 🎓 Academic Value
-
-This project demonstrates:
-
-* Constraint-based optimization
-* Hybrid AI systems
-* Nutritional modeling
-* Real-world ML application
-
----
-
-## 🏁 Conclusion
-
-PlantProtein AI is not just a prototype —
-it is a **robust, explainable, and scientifically grounded AI system** capable of generating real, defensible nutritional solutions.
-
----
-
-## 👨‍💻 Author
-
-Mahmoud Abdo
-Graduation Project — AI & Nutrition Optimization
-
----
-
-## 📌 Notes
-
-* All values normalized to **g/100g**
-* PDCAAS may be shown unclipped for analysis
-* System designed for transparency and academic defense
-
----
-
-## 🔥 Future Improvements
-
-* Top-N alternative blends
-* Real-time constraint explanation
-* Advanced recipe generation
-* UI analytics dashboard
-
----
-
-**"When no exact solution exists, the system finds the closest valid truth — not a fake answer."**
+Ahmed Mossad Nawar, Graduation Project
