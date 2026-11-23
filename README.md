@@ -71,4 +71,4 @@ On the most recent local training run the regression model reached R² = 0.975 (
 
 ## Author
 
-Ahmed Mossad Nawar, Graduation Project
+Ahmed Mossad Nawar
